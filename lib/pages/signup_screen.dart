@@ -13,12 +13,13 @@ class Signup extends StatefulWidget {
   State<Signup> createState() => _SignupState();
 }
 
-final TextEditingController _usernameController = TextEditingController();
-final TextEditingController _emailController = TextEditingController();
-final TextEditingController _passwordController = TextEditingController();
-final TextEditingController _confirmPasswordController = TextEditingController();
+
 
 class _SignupState extends State<Signup> {
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
   bool _usernameError = false;
   bool _emailError = false;
   bool _passwordError = false;
@@ -378,12 +379,28 @@ class _SignupState extends State<Signup> {
 
     String success = await user.signup();
     if (success=="Success") {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => HomeScreen(
-          username: _usernameController.text,
-        )),
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Account Created'),
+          backgroundColor: Colors.green,
+          margin: EdgeInsets.only(left: 33, bottom: 150.0, right: 33),
+          behavior: SnackBarBehavior.floating,
+          duration: Duration(seconds: 2),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+        ),
       );
+      Future.delayed(Duration(seconds: 3), () {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HomeScreen(
+              username: _usernameController.text,
+            ),
+          ),
+        );
+      });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -397,6 +414,13 @@ class _SignupState extends State<Signup> {
         ),
       );
     }
+  }
+  void dispose() {
+    _usernameController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    _emailController.dispose();
+    super.dispose();
   }
 }
 
