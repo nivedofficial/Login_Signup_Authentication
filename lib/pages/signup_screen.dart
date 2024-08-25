@@ -25,10 +25,12 @@ class _SignupState extends State<Signup> {
   bool _passwordError = false;
   bool _confirmPasswordError = false;
   bool _passwordMatchError=false;
+  bool _isSubmitClicked = false;
 
   bool hasUpperCase = false;
   bool hasSpecialCharacter = false;
   bool hasNumber = false;
+  bool hasValidPassword=false;
 
 
   void _checkPasswordConstraints(String password) {
@@ -36,6 +38,7 @@ class _SignupState extends State<Signup> {
       hasUpperCase = password.isNotEmpty && password[0] == password[0].toUpperCase();
       hasSpecialCharacter = password.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'));
       hasNumber = password.contains(RegExp(r'[0-9]'));
+
     });
   }
 
@@ -208,21 +211,21 @@ class _SignupState extends State<Signup> {
                         Text(
                           "•  Must start with a capital letter",
                           style: TextStyle(
-                              color: _passwordError?Color(0xffFF474C):Colors.black38,
+                              color: (_isSubmitClicked && !hasUpperCase)?Color(0xffFF474C):Colors.black38,
                               fontSize: 12),
                         ),
                       if (!hasSpecialCharacter)
                         Text(
                           "•  Must contain a special character",
                           style: TextStyle(
-                              color: _passwordError?Color(0xffFF474C):Colors.black38,
+                              color: (_isSubmitClicked && !hasSpecialCharacter)?Color(0xffFF474C):Colors.black38,
                               fontSize: 12),
                         ),
                       if (!hasNumber)
                         Text(
                           "•  Must contain a number",
                           style: TextStyle(
-                              color: _passwordError?Color(0xffFF474C):Colors.black38,
+                              color: (_isSubmitClicked && !hasNumber)?Color(0xffFF474C):Colors.black38,
                               fontSize: 12),
                         ),
                     ],
@@ -345,11 +348,13 @@ class _SignupState extends State<Signup> {
 
   Future<void> _signup(BuildContext context) async {
     setState(() {
+      _isSubmitClicked = true;
       _usernameError = _usernameController.text.isEmpty;
       _emailError = !isValidEmail(_emailController.text);
       _passwordError = _passwordController.text.isEmpty;
       _confirmPasswordError = _confirmPasswordController.text.isEmpty;
       _passwordMatchError= (_passwordController.text != _confirmPasswordController.text);
+      hasValidPassword=hasUpperCase && hasSpecialCharacter && hasNumber;
 
     });
 
@@ -366,8 +371,8 @@ class _SignupState extends State<Signup> {
         ),
       );
 
-
-    if (_usernameError || _emailError || _passwordError || _confirmPasswordError) {
+    if (_usernameError || _emailError || _passwordError ||
+        _confirmPasswordError || _passwordMatchError || !hasValidPassword) {
       return;
     }
 
